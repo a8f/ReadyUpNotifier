@@ -1,5 +1,10 @@
+import 'package:flutter/material.dart';
 const String DEFAULT_PORT = "5000";
 const String APP_TITLE = "ReadyUpNotifier";
+const String DISCONNECT_STR = "Disconnect";
+const EdgeInsets CONNECT_FORM_PADDING = EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0);
+const EdgeInsets CONNECT_BUTTON_PADDING = EdgeInsets.symmetric(vertical: 16.0);
+
 
 bool isValidIP(String ip) {
   // TODO get local ip and check that the specified IP matches
@@ -27,10 +32,10 @@ class ServerConnection {
     this.port = port;
   }
 
-  bool establishConnection() {
+  String establishConnection() {
     // TODO establish connection
-    connected = true;
-    return true;
+    connected = false;
+    return "Couldn't connect";
   }
 
   bool isAwaitingReady() {

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import 'connected_screen.dart';
 import 'utils.dart';
 
 void main() => runApp(MyApp());
@@ -20,7 +22,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Create a Form Widget
 class ConnectForm extends StatefulWidget {
   @override
   ConnectFormState createState() {
@@ -28,68 +29,79 @@ class ConnectForm extends StatefulWidget {
   }
 }
 
-// Create a corresponding State class. This class will hold the data related to
-// the form.
 class ConnectFormState extends State<ConnectForm> {
-  // Create a global key that will uniquely identify the Form widget and allow
-  // us to validate the form
-  //
-  // Note: This is a GlobalKey<FormState>, not a GlobalKey<MyCustomFormState>!
   final _formKey = GlobalKey<FormState>();
+  final ipController = TextEditingController();
+  final portController = TextEditingController();
+
+  @override
+  void dispose() {
+    ipController.dispose();
+    portController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Build a Form widget using the _formKey we created above
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          TextFormField(
-            keyboardType: TextInputType.number,
-            decoration: new InputDecoration(
-              labelText: "IP Address"
-            ),
-            validator: (value) {
-              if (!isValidIP(value)) {
-                return "Invalid IP";
-              }
-              if (!isDeviceOnNetwork(value)) {
-                return "Couldn't connect to host " + value;
-              }
-            },
+    return Padding(
+        padding: CONNECT_FORM_PADDING,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              TextFormField(
+                controller: ipController,
+                keyboardType: TextInputType.number,
+                decoration: new InputDecoration(labelText: "IP Address"),
+                validator: (value) {
+                  if (!isValidIP(value)) {
+                    return "Invalid IP";
+                  }
+                  if (!isDeviceOnNetwork(value)) {
+                    return "Couldn't connect to host " + value;
+                  }
+                },
+              ),
+              new TextFormField(
+                  controller: portController,
+                  keyboardType: TextInputType.number,
+                  decoration:
+                      new InputDecoration(hintText: "5000", labelText: "Port"),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      value = DEFAULT_PORT;
+                    }
+                    if (!isValidPort(value)) {
+                      return "Invalid port";
+                    }
+                  }),
+              Padding(
+                padding: CONNECT_BUTTON_PADDING,
+              child: RaisedButton(
+                onPressed: () {
+                  if (_formKey.currentState.validate()) {
+                    // hide keyboard
+                    FocusScope.of(context).requestFocus(new FocusNode());
+                    // try to connect
+                    ServerConnection connection = ServerConnection(
+                        ipController.toString(), portController.toString());
+                    String connectResult = connection.establishConnection();
+                    if (connectResult == "Success") {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ConnectedScreen(connection: connection)));
+                    } else {
+                      Scaffold.of(context).showSnackBar(SnackBar(content: Text(connectResult)));
+                    }
+                  }
+                },
+                child: Text('Connect'),
+              ),
+              )
+            ],
           ),
-          new TextFormField(
-            decoration: new InputDecoration(
-              hintText: "5000",
-              labelText: "Port"
-            ),
-            validator: (value) {
-              if (value.isEmpty) {
-                value = DEFAULT_PORT;
-              }
-              if (!isValidPort(value)) {
-                return "Invalid port";
-              }
-            }
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: RaisedButton(
-              onPressed: () {
-                // Validate will return true if the form is valid, or false if
-                // the form is invalid.
-                if (_formKey.currentState.validate()) {
-                  Scaffold.of(context)
-                      .showSnackBar(SnackBar(content: Text('Connecting')));
-                  
-                }
-              },
-              child: Text('Connect'),
-            ),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 }
