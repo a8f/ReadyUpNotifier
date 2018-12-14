@@ -17,7 +17,7 @@ class ConnectedScreen extends StatelessWidget {
             Navigator.pop(context);
             // cancel
           },
-          child: Text(DISCONNECT_STR),
+          child: Text(DISCONNECT_BUTTON_TEXT),
         ),
       ),
     );
