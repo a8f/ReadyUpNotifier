@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:web_socket_channel/io.dart';
 
 import 'connected_screen.dart';
 import 'utils.dart';
@@ -84,17 +85,11 @@ class ConnectFormState extends State<ConnectForm> {
                     // hide keyboard
                     FocusScope.of(context).requestFocus(new FocusNode());
                     // try to connect
-                    ServerConnection connection = ServerConnection(
-                        ipController.toString(), portController.toString());
-                    String connectResult = connection.establishConnection();
-                    if (connectResult == "Success") {
+                    var socket = IOWebSocketChannel.connect("ws://" + ipController.text + ":" + portController.text);
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => ConnectedScreen(connection: connection)));
-                    } else {
-                      Scaffold.of(context).showSnackBar(SnackBar(content: Text(connectResult)));
-                    }
+                              builder: (context) => ConnectedScreen(socket: socket)));
                   }
                 },
                 child: Text('Connect'),
