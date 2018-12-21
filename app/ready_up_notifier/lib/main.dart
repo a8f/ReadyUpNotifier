@@ -46,7 +46,8 @@ class ConnectFormState extends State<ConnectForm> {
   Widget build(BuildContext context) {
     return Padding(
         padding: CONNECT_FORM_PADDING,
-        child: Form(
+        child: Center(child:
+        Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,9 +55,12 @@ class ConnectFormState extends State<ConnectForm> {
               TextFormField(
                 controller: ipController,
                 keyboardType: TextInputType.number,
-                decoration: new InputDecoration(labelText: "IP Address"),
+                decoration: new InputDecoration(hintText: DEFAULT_IP, labelText: "IP Address"),
                 validator: (value) {
-                  if (!isValidIP(value)) {
+                  if (value.isEmpty) {
+                    value = DEFAULT_IP;
+                  }
+                  if (new RegExp(ipRegex).allMatches(value).isEmpty) {
                     return "Invalid IP";
                   }
                   if (!isDeviceOnNetwork(value)) {
@@ -68,12 +72,12 @@ class ConnectFormState extends State<ConnectForm> {
                   controller: portController,
                   keyboardType: TextInputType.number,
                   decoration:
-                      new InputDecoration(hintText: "5000", labelText: "Port"),
+                      new InputDecoration(hintText: DEFAULT_PORT, labelText: "Port"),
                   validator: (value) {
                     if (value.isEmpty) {
                       value = DEFAULT_PORT;
                     }
-                    if (!isValidPort(value)) {
+                    if (new RegExp(r"\d{1,5}").allMatches(value).isEmpty) {
                       return "Invalid port";
                     }
                   }),
@@ -97,6 +101,7 @@ class ConnectFormState extends State<ConnectForm> {
               )
             ],
           ),
-        ));
+        )
+    ));
   }
 }

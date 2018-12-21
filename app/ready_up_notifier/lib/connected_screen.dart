@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/status.dart' as status;
 import 'utils.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ConnectedScreen extends StatelessWidget {
   final IOWebSocketChannel socket;
@@ -10,46 +10,46 @@ class ConnectedScreen extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(APP_TITLE),
-      ),
-      body: Column(children: <Widget>[
-        Row(
-          children: <Widget>[
-            StreamBuilder(
-              stream: socket.stream,
-              builder: socketStreamBuilder,
-            )
-          ],
+        appBar: AppBar(
+          title: Text(APP_TITLE),
         ),
-        Row(
+        body: Center(
+            child: Column(
           children: <Widget>[
-            RaisedButton(
-              onPressed: () {
-                socket.sink.add("Hello world");
-              },
-              child: Text("Send test data"),
-            )
-          ]
-        ),
-        Row(
-          children: <Widget>[
-            Center(
-              child: RaisedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  // cancel
-                },
-                child: Text(DISCONNECT_BUTTON_TEXT),
-              ),
+            Row(
+              children: <Widget>[
+                StreamBuilder(
+                  stream: socket.stream,
+                  builder: socketStreamBuilder,
+                )
+              ],
             ),
+            Row(children: <Widget>[
+              RaisedButton(
+                onPressed: () {
+                  socket.sink.add("Hello world");
+                },
+                child: Text("Send test data"),
+              )
+            ]),
+            Row(
+              children: <Widget>[
+                Center(
+                  child: RaisedButton(
+                    onPressed: () {
+                      socket.sink.close(status.goingAway);
+                      Navigator.pop(context);
+                    },
+                    child: Text(DISCONNECT_BUTTON_TEXT),
+                  ),
+                ),
+              ],
+            )
           ],
-        )
-      ],)
-    );
+        )));
   }
 
-  Widget socketStreamBuilder (context, snapshot) {
+  Widget socketStreamBuilder(context, snapshot) {
     if (!snapshot.hasData) {
       return Text("No data");
     }
