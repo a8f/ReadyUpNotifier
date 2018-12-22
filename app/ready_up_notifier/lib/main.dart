@@ -34,6 +34,7 @@ class ConnectFormState extends State<ConnectForm> {
   final _formKey = GlobalKey<FormState>();
   final ipController = TextEditingController();
   final portController = TextEditingController();
+  final portFocusNode = new FocusNode();
 
   @override
   void dispose() {
@@ -56,10 +57,11 @@ class ConnectFormState extends State<ConnectForm> {
                 controller: ipController,
                 keyboardType: TextInputType.number,
                 decoration: new InputDecoration(hintText: DEFAULT_IP, labelText: "IP Address"),
+                onFieldSubmitted: (String value) {
+                  if (value.isEmpty) ipController.text = DEFAULT_IP;
+                  FocusScope.of(context).requestFocus(portFocusNode);
+                },
                 validator: (value) {
-                  if (value.isEmpty) {
-                    value = DEFAULT_IP;
-                  }
                   if (new RegExp(ipRegex).allMatches(value).isEmpty) {
                     return "Invalid IP";
                   }
@@ -71,12 +73,14 @@ class ConnectFormState extends State<ConnectForm> {
               new TextFormField(
                   controller: portController,
                   keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.go,
+                  focusNode: portFocusNode,
+                  onFieldSubmitted: (value) {
+                    if (value.isEmpty) portController.text = DEFAULT_PORT;
+                  },
                   decoration:
                       new InputDecoration(hintText: DEFAULT_PORT, labelText: "Port"),
                   validator: (value) {
-                    if (value.isEmpty) {
-                      value = DEFAULT_PORT;
-                    }
                     if (new RegExp(r"\d{1,5}").allMatches(value).isEmpty) {
                       return "Invalid port";
                     }

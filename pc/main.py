@@ -2,11 +2,6 @@ import re
 from threading import Thread
 from time import sleep
 from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
-from server import Server
-
-WAITING_FOR_MATCH = "waiting"
-MATCH_FOUND = "match found"
-MATCH_CANCELLED = "match cancelled"
 
 # TODO find path depending on os or prompt for path
 #path = "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\csgo"
@@ -30,25 +25,26 @@ def update_log():
                 continue
             if match_found and re.match(cancelled_message_regex, line):
                 match_found = False
+                client.sendMessage("match cancelled")
                 continue
             if re.match(ready_message_regex, line):
                 match_found = True
-
+                client.sendMessage("match found")
 
 class Server(WebSocket):
     def handleMessage(self):
         self.sendMessage(self.data)
-    
+
     def handleConnected(self):
         global connected, client
         client = self
         connected = True
-        print(self.address, "connected")
-    
+        print(self.address, " connected")
+
     def handleClose(self):
         global done
         done = True
-        print(self.address, "closed")
+        print(self.address, " closed")
 
 def serve():
     global done
@@ -61,8 +57,8 @@ if __name__ == '__main__':
     server_thread = Thread(target=serve)
     server_thread.start()
     print("awaiting connection\n")
-    while not connected:
-        pass
+    while not connected: pass
     client.sendMessage("test")
     #update_log()
     server_thread.join()
+    print("done")
