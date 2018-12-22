@@ -43,7 +43,7 @@ class Server(WebSocket):
 
     def handleClose(self):
         global done
-        done = True
+        #done = True
         print(self.address, " closed")
 
 def serve():
