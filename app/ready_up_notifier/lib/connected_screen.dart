@@ -41,9 +41,6 @@ class ConnectedScreen extends StatelessWidget {
           currentText = READY_CANCELLED_TEXT;
           color = IN_QUEUE_COLOR;
           break;
-        default:
-          currentText = NO_CONNECTION_TEXT;
-          currentText = snapshot.data;
       }
     }
     return Center(
@@ -69,12 +66,11 @@ class ConnectedScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     RaisedButton(
-                      onPressed: () {
-                        socket.sink.close(status.goingAway);
-                        Navigator.pop(context);
-                      },
-                      child: Text(DISCONNECT_BUTTON_TEXT),
-                    ),
+                        onPressed: () {
+                          socket.sink.close(status.goingAway);
+                          Navigator.pop(context);
+                        },
+                        child: Text(DISCONNECT_BUTTON_TEXT)),
                   ],
                 )
               ],

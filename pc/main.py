@@ -20,9 +20,9 @@ match_found = False
 in_queue = False
 
 def update_log():
-    global match_found, done, connected, client
+    global match_found, done, connected, client, in_queue
     with open(path + "/console.log", "r") as f:
-        #f.seek(0,2) # Go to end of file
+        f.seek(0,2) # Go to end of file
         while True:
             line = f.readline()
             if not line:
