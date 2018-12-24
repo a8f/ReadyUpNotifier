@@ -10,7 +10,7 @@ class Server():
     connected = False
     match_found = False
     in_queue = False
-    done = True
+    done = False
 
     def __init__(self, ready_regex=r'ready', cancel_regex=r'cancel', queue_regex=r'queue', ip='localhost', port=1234, update_rate=1, path='.', logfile='console.log'):
         self.path = "."
@@ -27,22 +27,22 @@ class Server():
     def update_log(self):
         with open(self.path + "/console.log", "r") as f:
             f.seek(0,2) # Go to end of file
-            while not True:
+            while not self.done:
                 line = f.readline()
                 if not line:
                     sleep(self.update_rate)
                     continue
                 if self.match_found and re.match(self.cancelled_regex, line):
-                    Server.match_found = False
+                    self.match_found = False
                     self.socket.send_message_to_all("cancel")
                     continue
                 if re.match(self.ready_regex, line):
-                    Server.match_found = True
+                    self.match_found = True
                     self.socket.send_message_to_all("ready")
                     continue
                 if re.match(self.queue_regex, line):
                     self.socket.send_message_to_all("queue")
-                    Server.in_queue = True
+                    self.in_queue = True
                     continue
 
     def serve(self):
@@ -67,7 +67,7 @@ class Server():
 
     def stop(self):
         print("Exiting")
-        done = True
+        self.done = True
         self.socket.shutdown()
 
     def start(self):
