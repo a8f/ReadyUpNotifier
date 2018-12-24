@@ -65,10 +65,15 @@ class Server():
         else:
             self.socket.send_message_to_all("waiting")
 
+    def on_client_leave(self, client, server):
+        print("Client {} disconnected".format(client["id"]))
+        self.connected = False
+
     def start(self):
         self.socket = WebsocketServer(self.port, host=self.ip)
         self.socket.set_fn_message_received(self.on_message)
         self.socket.set_fn_new_client(self.on_client_join)
+        self.socket.set_fn_client_left(self.on_client_leave)
         server_thread = Thread(target=self.serve)
         server_thread.start()
         print("Awaiting connection")

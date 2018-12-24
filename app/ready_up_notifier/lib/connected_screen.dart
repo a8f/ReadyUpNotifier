@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/status.dart' as status;
 
 import 'utils.dart';
 
@@ -12,6 +11,13 @@ class ConnectedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              socket.sink.close();
+              Navigator.pop(context, true);
+            },
+          ),
           title: Text(APP_TITLE),
         ),
         body: StreamBuilder(
@@ -47,7 +53,7 @@ class ConnectedScreen extends StatelessWidget {
         child: Container(
             color: color,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Row(
@@ -61,18 +67,6 @@ class ConnectedScreen extends StatelessWidget {
                                 fontSize: 48, fontWeight: FontWeight.bold)))
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    RaisedButton(
-                        onPressed: () {
-                          socket.sink.close(status.goingAway);
-                          Navigator.pop(context);
-                        },
-                        child: Text(DISCONNECT_BUTTON_TEXT)),
-                  ],
-                )
               ],
             )));
   }
