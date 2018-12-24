@@ -43,6 +43,20 @@ class ConnectFormState extends State<ConnectForm> {
     super.dispose();
   }
 
+  void submitForm() {
+    if (_formKey.currentState.validate()) {
+      // hide keyboard
+      FocusScope.of(context).requestFocus(new FocusNode());
+      // try to connect
+      var socket = IOWebSocketChannel.connect("ws://" + ipController.text + ":" + portController.text);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ConnectedScreen(socket: socket)));
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -77,6 +91,7 @@ class ConnectFormState extends State<ConnectForm> {
                   focusNode: portFocusNode,
                   onFieldSubmitted: (value) {
                     if (value.isEmpty) portController.text = DEFAULT_PORT;
+                    submitForm();
                   },
                   decoration:
                       new InputDecoration(hintText: DEFAULT_PORT, labelText: "Port"),
@@ -89,16 +104,7 @@ class ConnectFormState extends State<ConnectForm> {
                 padding: CONNECT_BUTTON_PADDING,
               child: RaisedButton(
                 onPressed: () {
-                  if (_formKey.currentState.validate()) {
-                    // hide keyboard
-                    FocusScope.of(context).requestFocus(new FocusNode());
-                    // try to connect
-                    var socket = IOWebSocketChannel.connect("ws://" + ipController.text + ":" + portController.text);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ConnectedScreen(socket: socket)));
-                  }
+                  submitForm();
                 },
                 child: Text('Connect'),
               ),
