@@ -4,5 +4,5 @@ s = Server(ip="localhost", port=1234)
 try:
     s.start()
 except KeyboardInterrupt:
-    s.socket.shutdown()
+    s.stop()
     raise SystemExit

@@ -10,7 +10,6 @@ if len(sys.argv) != 2:
 
 in_queue = False
 
-
 while True:
     cmd = input("Enter a command (ready, queue, cancel, quit):\n").lower()
     with open(sys.argv[1], 'a') as f:
@@ -32,4 +31,4 @@ while True:
             else:
                 print("Not in queue")
             continue
-        print('"' + cmd + '" is not a valid command')
+        print('"{}" is not a valid command'.format(cmd))

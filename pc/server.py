@@ -10,7 +10,7 @@ class Server():
     connected = False
     match_found = False
     in_queue = False
-    done = False
+    done = True
 
     def __init__(self, ready_regex=r'ready', cancel_regex=r'cancel', queue_regex=r'queue', ip='localhost', port=1234, update_rate=1, path='.', logfile='console.log'):
         self.path = "."
@@ -27,7 +27,7 @@ class Server():
     def update_log(self):
         with open(self.path + "/console.log", "r") as f:
             f.seek(0,2) # Go to end of file
-            while not self.done:
+            while not True:
                 line = f.readline()
                 if not line:
                     sleep(self.update_rate)
@@ -46,10 +46,6 @@ class Server():
                     continue
 
     def serve(self):
-        '''
-        while not self.done:
-            self.socket.handle_request()
-        '''
         self.socket.serve_forever()
 
     def on_message(self, client, server, message):
@@ -68,6 +64,11 @@ class Server():
     def on_client_leave(self, client, server):
         print("Client {} disconnected".format(client["id"]))
         self.connected = False
+
+    def stop(self):
+        print("Exiting")
+        done = True
+        self.socket.shutdown()
 
     def start(self):
         self.socket = WebsocketServer(self.port, host=self.ip)
