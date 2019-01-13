@@ -1,5 +1,5 @@
 name: ready_up_notifier
-description: Mobile notifications for PC game ready up prompts
+description: Get notified when a game is found on your PC
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -13,8 +13,10 @@ environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
 
 dependencies:
-  http: "0.12.0"
+  firebase_messaging: ^2.1.0
+  http: ^0.12.0
   web_socket_channel: ^1.0.9
+  shared_preferences: ^0.4.3
   flutter:
     sdk: flutter
 

@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/io.dart';
 
 import 'utils.dart';
 
 class ConnectedScreen extends StatelessWidget {
   final IOWebSocketChannel socket;
+  SharedPreferences prefs;
+
+  bool notificationsEnabled;
 
   ConnectedScreen({Key key, @required this.socket}) : super(key: key);
 
   Widget build(BuildContext context) {
+    //loadNotificationSettings();
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -24,6 +29,19 @@ class ConnectedScreen extends StatelessWidget {
           stream: socket.stream,
           builder: socketStreamBuilder,
         ));
+  }
+
+  void toggleNotifications(bool enableNotifications) async {
+    saveNotificationSettings(enableNotifications);
+  }
+
+  void loadNotificationSettings() async {
+    prefs = await SharedPreferences.getInstance();
+    notificationsEnabled = prefs.getBool("enableNotifications");
+  }
+
+  void saveNotificationSettings(bool enableNotifications) async {
+    await prefs.setBool('enableNotifications', enableNotifications);
   }
 
   Widget socketStreamBuilder(context, snapshot) {

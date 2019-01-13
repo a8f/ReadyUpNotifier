@@ -1,4 +1,4 @@
-package me.airstrafe.readyupnotifier;
+package net.airstrafe.readyupnotifier;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

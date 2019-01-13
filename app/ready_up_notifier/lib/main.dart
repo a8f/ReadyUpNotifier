@@ -48,21 +48,21 @@ class ConnectFormState extends State<ConnectForm> {
       // hide keyboard
       FocusScope.of(context).requestFocus(new FocusNode());
       // try to connect
-      var socket = IOWebSocketChannel.connect("ws://" + ipController.text + ":" + portController.text);
+      var socket = IOWebSocketChannel.connect(
+          "ws://" + ipController.text + ":" + portController.text);
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => ConnectedScreen(socket: socket)));
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
         padding: CONNECT_FORM_PADDING,
-        child: Center(child:
-        Form(
+        child: Center(
+            child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,7 +70,8 @@ class ConnectFormState extends State<ConnectForm> {
               TextFormField(
                 controller: ipController,
                 keyboardType: TextInputType.number,
-                decoration: new InputDecoration(hintText: DEFAULT_IP, labelText: "IP Address"),
+                decoration: new InputDecoration(
+                    hintText: DEFAULT_IP, labelText: "IP Address"),
                 onFieldSubmitted: (String value) {
                   if (value.isEmpty) ipController.text = DEFAULT_IP;
                   FocusScope.of(context).requestFocus(portFocusNode);
@@ -93,8 +94,8 @@ class ConnectFormState extends State<ConnectForm> {
                     if (value.isEmpty) portController.text = DEFAULT_PORT;
                     submitForm();
                   },
-                  decoration:
-                      new InputDecoration(hintText: DEFAULT_PORT, labelText: "Port"),
+                  decoration: new InputDecoration(
+                      hintText: DEFAULT_PORT, labelText: "Port"),
                   validator: (value) {
                     if (new RegExp(r"\d{1,5}").allMatches(value).isEmpty) {
                       return "Invalid port";
@@ -102,16 +103,15 @@ class ConnectFormState extends State<ConnectForm> {
                   }),
               Padding(
                 padding: CONNECT_BUTTON_PADDING,
-              child: RaisedButton(
-                onPressed: () {
-                  submitForm();
-                },
-                child: Text('Connect'),
-              ),
+                child: RaisedButton(
+                  onPressed: () {
+                    submitForm();
+                  },
+                  child: Text('Connect'),
+                ),
               )
             ],
           ),
-        )
-    ));
+        )));
   }
 }
