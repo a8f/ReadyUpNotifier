@@ -1,19 +1,37 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/io.dart';
 
 import 'utils.dart';
 
-class ConnectedScreen extends StatelessWidget {
+class ConnectedScreen extends StatefulWidget {
   final IOWebSocketChannel socket;
-  SharedPreferences prefs;
-
-  bool notificationsEnabled;
-
   ConnectedScreen({Key key, @required this.socket}) : super(key: key);
 
+  @override
+  State<StatefulWidget> createState() {
+    return ConnectedScreenState(socket);
+  }
+}
+
+class ConnectedScreenState extends State<ConnectedScreen> {
+  final IOWebSocketChannel socket;
+  bool newlyConnected = true;
+  bool notificationsEnabled = true;
+  String firebaseToken;
+
+  FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
+  ConnectedScreenState(this.socket);
+
+  @override
+  void initState() {
+    super.initState();
+    createFirebaseListeners();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    //loadNotificationSettings();
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -31,17 +49,24 @@ class ConnectedScreen extends StatelessWidget {
         ));
   }
 
-  void toggleNotifications(bool enableNotifications) async {
-    saveNotificationSettings(enableNotifications);
+  void createFirebaseListeners() {
+    _firebaseMessaging.getToken().then((token) {
+      this.firebaseToken = token;
+      print("Token: $token");
+    });
+    _firebaseMessaging.configure(
+        onMessage: (Map<String, dynamic> message) async {
+      print("Message: $message");
+    }, onResume: (Map<String, dynamic> message) async {
+      print("Resume: $message");
+    }, onLaunch: (Map<String, dynamic> message) async {
+      print("Launch: $message");
+    });
   }
 
-  void loadNotificationSettings() async {
-    prefs = await SharedPreferences.getInstance();
-    notificationsEnabled = prefs.getBool("enableNotifications");
-  }
-
-  void saveNotificationSettings(bool enableNotifications) async {
-    await prefs.setBool('enableNotifications', enableNotifications);
+  void toggleNotifications(bool enableNotifications) {
+    // TODO tell server to toggle notifications
+    notificationsEnabled = enableNotifications;
   }
 
   Widget socketStreamBuilder(context, snapshot) {
@@ -50,7 +75,12 @@ class ConnectedScreen extends StatelessWidget {
     if (snapshot.hasData) {
       switch (snapshot.data) {
         case "waiting":
-          currentText = WAITING_TEXT;
+          if (newlyConnected) {
+            currentText = CONNECTED_TEXT + "\n" + WAITING_TEXT;
+            newlyConnected = false;
+          } else {
+            currentText = WAITING_TEXT;
+          }
           color = WAITING_COLOR;
           break;
         case "ready":
@@ -82,9 +112,31 @@ class ConnectedScreen extends StatelessWidget {
                         height: 2 / 3 * MediaQuery.of(context).size.height,
                         child: Text(currentText,
                             style: TextStyle(
-                                fontSize: 48, fontWeight: FontWeight.bold)))
+                                fontSize: 48, fontWeight: FontWeight.bold))),
                   ],
                 ),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Transform.scale(
+                        scale: 1.8,
+                        child: Switch(
+                          value: notificationsEnabled,
+                          onChanged: toggleNotifications,
+                        ),
+                      )
+                    ]),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        "\n" + NOTIFICATIONS_TOOLTIP,
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
+                      )
+                    ])
               ],
             )));
   }

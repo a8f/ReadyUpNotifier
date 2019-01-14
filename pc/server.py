@@ -11,6 +11,7 @@ class Server():
     match_found = False
     in_queue = False
     done = False
+    notify = False
 
     def __init__(self, ready_regex=r'ready', cancel_regex=r'cancel', queue_regex=r'queue', ip='localhost', port=1234, update_rate=1, path='.', logfile='console.log'):
         self.path = "."
