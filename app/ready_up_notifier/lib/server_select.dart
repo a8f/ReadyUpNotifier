@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'add_server.dart';
 import 'utils.dart';
+import 'server.dart';
 
 class ServerSelectScreen extends StatelessWidget {
   @override
@@ -36,6 +37,7 @@ class ServerSelectState extends State<ServerSelect> {
   }
 
   List<Widget> getServerWidgets() {
+    loadServers();
     List<Widget> widgets = new List<Widget>();
     for (Server s in servers) {
       widgets.add(ListTile(
@@ -57,14 +59,7 @@ class ServerSelectState extends State<ServerSelect> {
   }
 
   void loadServers() {
-    List<String> serverStringList =
-        SyncSharedPreferences.sharedPreferences.getStringList("servers");
-    if (serverStringList == null) {
-      servers = new List<Server>();
-    } else {
-      servers = stringListToServerList(
-          SyncSharedPreferences.sharedPreferences.getStringList("servers"));
-    }
+    servers = getSavedServers();
   }
 
   void saveServers() {

@@ -3,6 +3,7 @@ import 'package:web_socket_channel/io.dart';
 
 import 'connected_screen.dart';
 import 'utils.dart';
+import 'server.dart';
 
 class AddServerScreen extends StatelessWidget {
   @override
@@ -28,20 +29,40 @@ class ConnectFormState extends State<ConnectForm> {
   final ipController = TextEditingController();
   final portController = TextEditingController();
   final portFocusNode = new FocusNode();
+  final nicknameController = TextEditingController();
+  final nicknameFocusNode = new FocusNode();
 
   @override
   void dispose() {
     ipController.dispose();
     portController.dispose();
+    nicknameController.dispose();
     super.dispose();
   }
 
   bool saveServer() {
+    // Hide keyboard
+    FocusScope.of(context).requestFocus(new FocusNode());
     if (_formKey.currentState.validate()) {
-      // hide keyboard
-      FocusScope.of(context).requestFocus(new FocusNode());
-      // TODO save server if not exists
+      // Save new server if it doesn't exist
+      Server newServer = new Server(ipController.text);
+      if (portController.text.isNotEmpty) {
+        newServer.port = int.parse(portController.text);
+      }
+      if (nicknameController.text.isNotEmpty) {
+        newServer.nickname = nicknameController.text;
+      }
+      List<Server> savedServers = getSavedServers();
+      if (savedServers.contains(newServer)) {
+        // TODO show message that server already exists
+        return false;
+      }
+      savedServers.add(newServer);
+      SyncSharedPreferences.sharedPreferences
+          .setStringList("servers", serverListToStringList(savedServers));
+      return true;
     }
+    return false;
   }
 
   void saveAndBack() {
@@ -103,15 +124,15 @@ class ConnectFormState extends State<ConnectForm> {
                   }
                 },
               ),
-              new TextFormField(
+              TextFormField(
                   controller: portController,
                   keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.go,
+                  textInputAction: TextInputAction.next,
                   focusNode: portFocusNode,
                   onFieldSubmitted: (value) {
                     if (value.isEmpty)
                       portController.text = DEFAULT_PORT.toString();
-                    submitForm();
+                    FocusScope.of(context).requestFocus(nicknameFocusNode);
                   },
                   decoration: new InputDecoration(
                       hintText: DEFAULT_PORT.toString(), labelText: "Port"),
@@ -120,6 +141,17 @@ class ConnectFormState extends State<ConnectForm> {
                       return "Invalid port";
                     }
                   }),
+              TextFormField(
+                  controller: nicknameController,
+                  textInputAction: TextInputAction.done,
+                  focusNode: nicknameFocusNode,
+                  onFieldSubmitted: (value) {
+                    if (value.isEmpty)
+                      nicknameController.text = ipController.text;
+                    saveAndBack();
+                  },
+                  decoration: new InputDecoration(
+                      hintText: "PC", labelText: "Nickname")),
               Padding(
                   padding: CONNECT_BUTTON_PADDING,
                   child: Row(
