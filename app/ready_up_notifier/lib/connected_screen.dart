@@ -111,8 +111,7 @@ class ConnectedScreenState extends State<ConnectedScreen> {
                     Container(
                         height: 2 / 3 * MediaQuery.of(context).size.height,
                         child: Text(currentText,
-                            style: TextStyle(
-                                fontSize: 48, fontWeight: FontWeight.bold))),
+                            style: CONNECTION_STATUS_TEXT_STYLE)),
                   ],
                 ),
                 Row(

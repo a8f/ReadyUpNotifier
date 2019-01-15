@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// Wrapper for accessing SharedPreferences synchronously
 class SyncSharedPreferences {
   static SharedPreferences sharedPreferences;
   static Future loadSharedPreferences() async {
@@ -27,6 +28,14 @@ const EdgeInsets CONNECT_FORM_PADDING =
     EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0);
 const EdgeInsets CONNECT_BUTTON_PADDING = EdgeInsets.symmetric(vertical: 16.0);
 const String ipRegex = r"(\d{1,3}\.){3}\d{1,3}";
+const TextStyle CONNECTION_STATUS_TEXT_STYLE =
+    TextStyle(fontSize: 48, fontWeight: FontWeight.bold);
+const TextStyle CONNECTION_LIST_ENTRY_TEXT_STYLE =
+    TextStyle(fontSize: 34, fontWeight: FontWeight.bold);
+const Color CONNECTION_LIST_ENTRY_BG_COLOR = Color.fromRGBO(200, 200, 200, 1);
+const String NEW_SERVER_TEXT = "New Server";
+const String SAVE_TEXT = "Save";
+const String SAVE_AND_CONNECT_TEXT = "Save & Connect";
 
 bool isDeviceOnNetwork(String ip) {
   // TODO check if device is on network

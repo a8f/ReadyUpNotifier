@@ -4,6 +4,18 @@ import 'package:web_socket_channel/io.dart';
 import 'connected_screen.dart';
 import 'utils.dart';
 
+class AddServerScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(APP_TITLE),
+      ),
+      body: ConnectForm(),
+    );
+  }
+}
+
 class ConnectForm extends StatefulWidget {
   @override
   ConnectFormState createState() {
@@ -22,6 +34,31 @@ class ConnectFormState extends State<ConnectForm> {
     ipController.dispose();
     portController.dispose();
     super.dispose();
+  }
+
+  bool saveServer() {
+    if (_formKey.currentState.validate()) {
+      // hide keyboard
+      FocusScope.of(context).requestFocus(new FocusNode());
+      // TODO save server if not exists
+    }
+  }
+
+  void saveAndBack() {
+    if (saveServer()) {
+      Navigator.pop(context);
+    }
+  }
+
+  void saveAndConnect() {
+    if (saveServer()) {
+      var socket = IOWebSocketChannel.connect(
+          "ws://" + ipController.text + ":" + portController.text);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ConnectedScreen(socket: socket)));
+    }
   }
 
   void submitForm() {
@@ -84,14 +121,17 @@ class ConnectFormState extends State<ConnectForm> {
                     }
                   }),
               Padding(
-                padding: CONNECT_BUTTON_PADDING,
-                child: RaisedButton(
-                  onPressed: () {
-                    submitForm();
-                  },
-                  child: Text('Connect'),
-                ),
-              )
+                  padding: CONNECT_BUTTON_PADDING,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      RaisedButton(
+                          onPressed: saveAndBack, child: Text(SAVE_TEXT)),
+                      RaisedButton(
+                          onPressed: saveAndConnect,
+                          child: Text(SAVE_AND_CONNECT_TEXT))
+                    ],
+                  )),
             ],
           ),
         )));

@@ -14,15 +14,6 @@ Future initAndRun() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final appTitle = APP_TITLE;
-    return MaterialApp(
-      title: appTitle,
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text(appTitle),
-        ),
-        body: ServerSelect(),
-      ),
-    );
+    return MaterialApp(title: APP_TITLE, home: ServerSelectScreen());
   }
 }
