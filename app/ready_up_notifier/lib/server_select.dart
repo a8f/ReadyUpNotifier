@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'add_server.dart';
 import 'utils.dart';
 import 'server.dart';
+import 'connected_screen.dart';
 
 class ServerSelectScreen extends StatelessWidget {
   @override
@@ -41,6 +42,7 @@ class ServerSelectState extends State<ServerSelect> {
     List<Widget> widgets = new List<Widget>();
     for (Server s in servers) {
       widgets.add(ListTile(
+          onTap: () => connectToServer(s),
           title: Center(
               child:
                   Text(s.nickname, style: CONNECTION_LIST_ENTRY_TEXT_STYLE))));
@@ -51,6 +53,13 @@ class ServerSelectState extends State<ServerSelect> {
             child: Text(NEW_SERVER_TEXT,
                 style: CONNECTION_LIST_ENTRY_TEXT_STYLE))));
     return widgets;
+  }
+
+  void connectToServer(Server server) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ConnectedScreen(server: server)));
   }
 
   void addNewServer() {

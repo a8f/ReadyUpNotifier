@@ -3,13 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
 
 import 'utils.dart';
+import 'server.dart';
 
 class ConnectedScreen extends StatefulWidget {
-  final IOWebSocketChannel socket;
-  ConnectedScreen({Key key, @required this.socket}) : super(key: key);
+  final Server server;
+  ConnectedScreen({Key key, @required this.server}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
+    //print("ip: " + server.ip + ", port: " + server.port.toString());
+    var socket = IOWebSocketChannel.connect(
+        "ws://" + server.ip + ":" + server.port.toString());
     return ConnectedScreenState(socket);
   }
 }

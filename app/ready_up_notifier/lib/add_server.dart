@@ -40,7 +40,7 @@ class ConnectFormState extends State<ConnectForm> {
     super.dispose();
   }
 
-  bool saveServer() {
+  Server saveServer() {
     // Hide keyboard
     FocusScope.of(context).requestFocus(new FocusNode());
     if (_formKey.currentState.validate()) {
@@ -55,44 +55,29 @@ class ConnectFormState extends State<ConnectForm> {
       List<Server> savedServers = getSavedServers();
       if (savedServers.contains(newServer)) {
         // TODO show message that server already exists
-        return false;
+        return null;
       }
       savedServers.add(newServer);
       SyncSharedPreferences.sharedPreferences
           .setStringList("servers", serverListToStringList(savedServers));
-      return true;
+      return newServer;
     }
-    return false;
+    return null;
   }
 
   void saveAndBack() {
-    if (saveServer()) {
+    if (saveServer() != null) {
       Navigator.pop(context);
     }
   }
 
   void saveAndConnect() {
-    if (saveServer()) {
-      var socket = IOWebSocketChannel.connect(
-          "ws://" + ipController.text + ":" + portController.text);
+    Server newServer = saveServer();
+    if (newServer != null) {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => ConnectedScreen(socket: socket)));
-    }
-  }
-
-  void submitForm() {
-    if (_formKey.currentState.validate()) {
-      // hide keyboard
-      FocusScope.of(context).requestFocus(new FocusNode());
-      // try to connect
-      var socket = IOWebSocketChannel.connect(
-          "ws://" + ipController.text + ":" + portController.text);
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => ConnectedScreen(socket: socket)));
+              builder: (context) => ConnectedScreen(server: newServer)));
     }
   }
 

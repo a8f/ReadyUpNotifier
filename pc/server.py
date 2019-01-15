@@ -11,29 +11,35 @@ class Server():
     match_found = False
     in_queue = False
     done = False
-    notify = False
 
-    def __init__(self, ready_regex=r'ready', cancel_regex=r'cancel', queue_regex=r'queue', ip='localhost', port=1234, update_rate=1, path='.', logfile='console.log'):
-        self.path = "."
+    def __init__(self, ready_regex=r'ready', cancel_regex=r'cancel', queue_regex=r'queue', ip='localhost', port=12345, update_rate=1, logfile='./console.log'):
         self.ready_regex = ready_regex
         self.cancel_regex = cancel_regex
         self.queue_regex = queue_regex
         self.ip = ip
         self.port = port
         self.update_rate = update_rate
-        self.path = path
         self.logfile = logfile
         self.socket = None
 
+    def setIp(self, ip):
+        self.ip = ip
+
+    def setPort(self, port):
+        self.port = port
+
+    def setLogfile(self, logfile):
+        self.logfile = logfile
+
     def update_log(self):
-        with open(self.path + "/console.log", "r") as f:
+        with open(self.logfile, "r") as f:
             f.seek(0,2) # Go to end of file
             while not self.done:
                 line = f.readline()
                 if not line:
                     sleep(self.update_rate)
                     continue
-                if self.match_found and re.match(self.cancelled_regex, line):
+                if self.match_found and re.match(self.cancel_regex, line):
                     self.match_found = False
                     self.socket.send_message_to_all("cancel")
                     continue
@@ -42,6 +48,7 @@ class Server():
                     self.socket.send_message_to_all("ready")
                     continue
                 if re.match(self.queue_regex, line):
+                    print("sending queue notification")
                     self.socket.send_message_to_all("queue")
                     self.in_queue = True
                     continue
@@ -67,7 +74,7 @@ class Server():
         self.connected = False
 
     def stop(self):
-        print("Exiting")
+        print("\nExiting")
         self.done = True
         self.socket.shutdown()
 
