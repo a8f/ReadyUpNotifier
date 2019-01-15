@@ -31,7 +31,15 @@ class ConnectForm extends StatefulWidget {
 
 class ConnectFormState extends State<ConnectForm> {
   int serverId;
-  ConnectFormState({@required this.serverId});
+  ConnectFormState({@required this.serverId}) {
+    List<Server> savedServers = getSavedServers();
+    for (Server s in savedServers) {
+      if (s.id == serverId) {
+        fillConnectFormFromServer(s);
+        break;
+      }
+    }
+  }
   final _formKey = GlobalKey<FormState>();
   final ipController = TextEditingController();
   final portController = TextEditingController();
@@ -45,6 +53,12 @@ class ConnectFormState extends State<ConnectForm> {
     portController.dispose();
     nicknameController.dispose();
     super.dispose();
+  }
+
+  void fillConnectFormFromServer(Server server) {
+    ipController.text = server.ip;
+    portController.text = server.port.toString();
+    nicknameController.text = server.nickname;
   }
 
   Server serverFromForm() {
@@ -61,6 +75,7 @@ class ConnectFormState extends State<ConnectForm> {
   Server saveServer() {
     // Hide keyboard
     FocusScope.of(context).requestFocus(new FocusNode());
+    // Validate and save
     if (_formKey.currentState.validate()) {
       Server newServer = serverFromForm();
       List<Server> savedServers = getSavedServers();

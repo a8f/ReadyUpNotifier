@@ -80,6 +80,7 @@ List<Server> removeServerById(List<Server> servers, int id) {
   for (Server s in updatedServers) {
     if (s.id == id) {
       updatedServers.remove(s);
+      break;
     }
   }
   return updatedServers;

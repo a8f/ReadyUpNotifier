@@ -1,4 +1,3 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
 
@@ -22,16 +21,11 @@ class ConnectedScreenState extends State<ConnectedScreen> {
   final IOWebSocketChannel socket;
   bool newlyConnected = true;
   bool notificationsEnabled = true;
-  String firebaseToken;
-
-  FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-
   ConnectedScreenState(this.socket);
 
   @override
   void initState() {
     super.initState();
-    createFirebaseListeners();
   }
 
   @override
@@ -51,21 +45,6 @@ class ConnectedScreenState extends State<ConnectedScreen> {
           stream: socket.stream,
           builder: socketStreamBuilder,
         ));
-  }
-
-  void createFirebaseListeners() {
-    _firebaseMessaging.getToken().then((token) {
-      this.firebaseToken = token;
-      print("Token: $token");
-    });
-    _firebaseMessaging.configure(
-        onMessage: (Map<String, dynamic> message) async {
-      print("Message: $message");
-    }, onResume: (Map<String, dynamic> message) async {
-      print("Resume: $message");
-    }, onLaunch: (Map<String, dynamic> message) async {
-      print("Launch: $message");
-    });
   }
 
   void toggleNotifications(bool enableNotifications) {
