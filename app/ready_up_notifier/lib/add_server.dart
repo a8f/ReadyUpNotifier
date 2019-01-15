@@ -6,25 +6,32 @@ import 'utils.dart';
 import 'server.dart';
 
 class AddServerScreen extends StatelessWidget {
+  int serverId;
+  AddServerScreen({Key key, @required this.serverId}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(APP_TITLE),
       ),
-      body: ConnectForm(),
+      body: ConnectForm(serverId: this.serverId),
     );
   }
 }
 
 class ConnectForm extends StatefulWidget {
+  int serverId;
+  ConnectForm({Key key, @required this.serverId}) : super(key: key);
+
   @override
   ConnectFormState createState() {
-    return ConnectFormState();
+    return ConnectFormState(serverId: this.serverId);
   }
 }
 
 class ConnectFormState extends State<ConnectForm> {
+  int serverId;
+  ConnectFormState({@required this.serverId});
   final _formKey = GlobalKey<FormState>();
   final ipController = TextEditingController();
   final portController = TextEditingController();
@@ -40,29 +47,33 @@ class ConnectFormState extends State<ConnectForm> {
     super.dispose();
   }
 
+  Server serverFromForm() {
+    Server newServer = new Server(this.serverId, ipController.text);
+    if (portController.text.isNotEmpty) {
+      newServer.port = int.parse(portController.text);
+    }
+    if (nicknameController.text.isNotEmpty) {
+      newServer.nickname = nicknameController.text;
+    }
+    return newServer;
+  }
+
   Server saveServer() {
     // Hide keyboard
     FocusScope.of(context).requestFocus(new FocusNode());
     if (_formKey.currentState.validate()) {
-      // Save new server if it doesn't exist
-      Server newServer = new Server(ipController.text);
-      if (portController.text.isNotEmpty) {
-        newServer.port = int.parse(portController.text);
-      }
-      if (nicknameController.text.isNotEmpty) {
-        newServer.nickname = nicknameController.text;
-      }
+      Server newServer = serverFromForm();
       List<Server> savedServers = getSavedServers();
-      if (savedServers.contains(newServer)) {
-        // TODO show message that server already exists
-        return null;
-      }
       savedServers.add(newServer);
-      SyncSharedPreferences.sharedPreferences
-          .setStringList("servers", serverListToStringList(savedServers));
+      saveServers(savedServers);
       return newServer;
     }
     return null;
+  }
+
+  void deleteServer() {
+    deleteServerById(serverId);
+    Navigator.pop(context);
   }
 
   void saveAndBack() {
@@ -94,10 +105,10 @@ class ConnectFormState extends State<ConnectForm> {
               TextFormField(
                 controller: ipController,
                 keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.next,
                 decoration: new InputDecoration(
-                    hintText: DEFAULT_IP, labelText: "IP Address"),
+                    hintText: "IP Address", labelText: "IP Address"),
                 onFieldSubmitted: (String value) {
-                  if (value.isEmpty) ipController.text = DEFAULT_IP;
                   FocusScope.of(context).requestFocus(portFocusNode);
                 },
                 validator: (value) {
@@ -115,12 +126,10 @@ class ConnectFormState extends State<ConnectForm> {
                   textInputAction: TextInputAction.next,
                   focusNode: portFocusNode,
                   onFieldSubmitted: (value) {
-                    if (value.isEmpty)
-                      portController.text = DEFAULT_PORT.toString();
                     FocusScope.of(context).requestFocus(nicknameFocusNode);
                   },
-                  decoration: new InputDecoration(
-                      hintText: DEFAULT_PORT.toString(), labelText: "Port"),
+                  decoration:
+                      new InputDecoration(hintText: "Port", labelText: "Port"),
                   validator: (value) {
                     if (new RegExp(r"\d{1,5}").allMatches(value).isEmpty) {
                       return "Invalid port";
@@ -136,19 +145,22 @@ class ConnectFormState extends State<ConnectForm> {
                     saveAndBack();
                   },
                   decoration: new InputDecoration(
-                      hintText: "PC", labelText: "Nickname")),
+                      hintText: "Nickname", labelText: "Nickname")),
               Padding(
                   padding: CONNECT_BUTTON_PADDING,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      RaisedButton(
-                          onPressed: saveAndBack, child: Text(SAVE_TEXT)),
-                      RaisedButton(
-                          onPressed: saveAndConnect,
-                          child: Text(SAVE_AND_CONNECT_TEXT))
-                    ],
-                  )),
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        RaisedButton(
+                            onPressed: deleteServer,
+                            child: Text(DELETE_TEXT),
+                            color: DELETE_BUTTON_COLOR),
+                        RaisedButton(
+                            onPressed: saveAndBack, child: Text(SAVE_TEXT)),
+                        RaisedButton(
+                            onPressed: saveAndConnect,
+                            child: Text(SAVE_AND_CONNECT_TEXT)),
+                      ])),
             ],
           ),
         )));

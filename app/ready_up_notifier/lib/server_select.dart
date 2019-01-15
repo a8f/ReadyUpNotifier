@@ -64,7 +64,9 @@ class ServerSelectState extends State<ServerSelect> {
 
   void addNewServer() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => AddServerScreen()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => AddServerScreen(serverId: newServerId())));
   }
 
   void loadServers() {

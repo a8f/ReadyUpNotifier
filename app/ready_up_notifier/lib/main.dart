@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'utils.dart';
+import 'server.dart';
 import 'server_select.dart';
 
 void main() {
@@ -8,6 +9,7 @@ void main() {
 
 Future initAndRun() async {
   await SyncSharedPreferences.loadSharedPreferences();
+  //saveServers(new List<Server>()); // Uncomment to zero saved servers on startup
   runApp(MyApp());
 }
 

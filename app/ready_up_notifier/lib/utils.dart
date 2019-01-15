@@ -3,9 +3,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // Wrapper for accessing SharedPreferences synchronously
 class SyncSharedPreferences {
+  static bool initialized = false;
   static SharedPreferences sharedPreferences;
   static Future loadSharedPreferences() async {
     sharedPreferences = await SharedPreferences.getInstance();
+    initialized = true;
   }
 }
 
@@ -36,6 +38,8 @@ const Color CONNECTION_LIST_ENTRY_BG_COLOR = Color.fromRGBO(200, 200, 200, 1);
 const String NEW_SERVER_TEXT = "New Server";
 const String SAVE_TEXT = "Save";
 const String SAVE_AND_CONNECT_TEXT = "Save & Connect";
+const String DELETE_TEXT = "Delete";
+const Color DELETE_BUTTON_COLOR = Color.fromRGBO(255, 25, 0, 1);
 
 bool isDeviceOnNetwork(String ip) {
   // TODO check if device is on network
